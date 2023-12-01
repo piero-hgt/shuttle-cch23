@@ -1,3 +1,5 @@
+use std::path::PathBuf;
+
 use rocket::{get, routes, http::Status};
 
 #[get("/")]
@@ -10,9 +12,25 @@ fn minus_one_error() -> Status {
     Status::InternalServerError
 }
 
-#[get("/1/<num1>/<num2>")]
-fn cube_the_bits(num1: u32, num2: u32) -> String {
-    format!("{}", (num1 ^ num2).pow(3))
+#[get("/1/<path..>")]
+fn cube_the_bits(path: PathBuf) -> String {
+    let numbers: Vec<u32> = match path.iter().map(|x| x.to_str().unwrap().parse::<u32>()).collect() {
+        Ok(numbers) => numbers,
+        Err(_) => return String::from("Unable to parse path to u32"),
+    };
+
+    if numbers.len() == 0 {
+        return String::from("Missing arguments (at east one required)");
+    }
+    if numbers.len() > 20 {
+        return String::from("Too many arguments (max 20)");
+    }
+    let mut sled: u32 = 0;
+    for number in numbers {
+        sled = sled ^ number;
+    }
+
+    format!("{}", sled.pow(3))
 }
 
 #[shuttle_runtime::main]
