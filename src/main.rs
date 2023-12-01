@@ -22,7 +22,7 @@ fn cube_the_bits(path: PathBuf) -> String {
     if numbers.len() == 0 {
         return String::from("Missing arguments (at east one required)");
     }
-    if numbers.len() > 20 {
+    if numbers.len() >= 20 {
         return String::from("Too many arguments (max 20)");
     }
     let mut sled: u32 = 0;
