@@ -1,18 +1,30 @@
-use axum::{routing::get, Router, http::StatusCode};
+use rocket::{get, routes, http::Status};
 
-async fn hello_world() -> &'static str {
+#[get("/")]
+fn hello_world() -> &'static str {
     "Hello, world!"
 }
 
-async fn minus_one_error() -> StatusCode {
-    StatusCode::INTERNAL_SERVER_ERROR
+#[get("/-1/error")]
+fn minus_one_error() -> Status {
+    Status::InternalServerError
+}
+
+#[get("/1/<num1>/<num2>")]
+fn cube_the_bits(num1: u32, num2: u32) -> String {
+    format!("{}", (num1 ^ num2).pow(3))
 }
 
 #[shuttle_runtime::main]
-async fn main() -> shuttle_axum::ShuttleAxum {
-    let router = Router::new()
-        .route("/", get(hello_world))
-        .route("/-1/error", get(minus_one_error));
+async fn main() -> shuttle_rocket::ShuttleRocket {
+    let rocket = rocket::build()
+        .mount("/",
+        routes![
+            hello_world,
+            minus_one_error,
+            cube_the_bits
+        ]
+    );
 
-    Ok(router.into())
+    Ok(rocket.into())
 }
