@@ -1,4 +1,5 @@
 use std::path::PathBuf;
+use rocket::serde::Deserialize;
 
 pub struct Sled {
     packets: Vec<i32>
@@ -22,4 +23,11 @@ impl Sled {
 
         sled.pow(3)
     }
+}
+
+#[derive(Deserialize, Debug)]
+#[serde(crate = "rocket::serde")]
+pub struct Deer<'a> {
+    pub name: &'a str,
+    pub  strength: u32
 }
