@@ -104,12 +104,6 @@ impl DeerContestOutput {
         let magician = collection.magician();
         let consumer = collection.consumer();
 
-        // {
-        //     "fastest": "Speeding past the finish line with a strength of 5 is Dasher",
-        //     "tallest": "Dasher is standing tall with his 36 cm wide antlers",
-        //     "magician": "Dasher could blast you away with a snow magic power of 9001",
-        //     "consumer": "Dancer ate lots of candies, but also some grass"
-        // }
         DeerContestOutput {
             fastest: format!("Speeding past the finish line with a strength of {} is {}", fastest.strength, fastest.name),
             tallest: format!("{} is standing tall with his {} cm wide antlers", tallest.name, tallest.antler_width),
@@ -118,3 +112,24 @@ impl DeerContestOutput {
         }
     }
 }
+
+#[derive(Debug, Serialize)]
+pub struct ElfCount {
+    #[serde(rename(serialize = "elf"))]
+    count: u32,
+    #[serde(rename(serialize = "elf on a shelf"))]
+    on_shelf: u32,
+    #[serde(rename(serialize = "shelf with no elf on it"))]
+    empty_shelf: u32,
+}
+
+impl ElfCount {
+    pub fn new(count: u32, on_shelf: u32, empty_shelf: u32) -> Self {
+        ElfCount {
+            count,
+            on_shelf,
+            empty_shelf
+        }
+    }
+}
+

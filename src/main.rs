@@ -1,4 +1,10 @@
-use cch23_piero_hgt::{Sled, Deer, DeerCollection, DeerContestOutput};
+use cch23_piero_hgt::{
+    Sled,
+    Deer,
+    DeerCollection,
+    DeerContestOutput,
+    ElfCount,
+};
 use rocket::{
     get,
     post,
@@ -36,6 +42,16 @@ fn day_4_eating_candy_contest(deers: Json<Vec<Deer>>) -> Json<DeerContestOutput>
     Json(DeerContestOutput::from_deer_collection(collection))
 }
 
+#[post("/6", format = "text/plain", data = "<text>")]
+fn day_6_elf(text: String) -> Json<ElfCount> {
+    let count = text.matches("elf").count();
+    let on_shelf = text.matches("elf on a shelf").count();
+    let empty_shelf = text.matches("shelf").count() - on_shelf;
+    // println!("{} {} {}", count, on_shelf, empty_shelf);
+
+    Json(ElfCount::new(count as u32, on_shelf as u32, empty_shelf as u32))
+}
+
 #[shuttle_runtime::main]
 async fn main() -> shuttle_rocket::ShuttleRocket {
     let rocket = rocket::build().mount(
@@ -46,6 +62,7 @@ async fn main() -> shuttle_rocket::ShuttleRocket {
             cube_the_bits,
             day_4_reindeer_cheer,
             day_4_eating_candy_contest,
+            day_6_elf,
         ]
     );
 
