@@ -1,29 +1,8 @@
-use std::path::PathBuf;
+use rocket::{
+    post,
+    serde::json::Json,
+};
 use serde::{Deserialize, Serialize};
-
-pub struct Sled {
-    packets: Vec<i32>
-}
-
-impl Sled {
-    pub fn create_from_pathbuf(path: PathBuf) -> Self {
-        let numbers: Vec<i32> = match path.iter().map(|x| x.to_str().unwrap().parse::<i32>()).collect() {
-            Ok(numbers) => numbers,
-            Err(_) => return Sled { packets: Vec::new() },
-        };
-
-        Sled { packets: numbers }
-    }
-
-    pub fn xor_cube(&self) -> i32 {
-        let mut sled: i32 = 0;
-        for number in &self.packets {
-            sled = sled ^ number;
-        }
-
-        sled.pow(3)
-    }
-}
 
 #[derive(Deserialize, Debug)]
 #[serde(crate = "rocket::serde")]
@@ -43,7 +22,7 @@ pub struct Deer {
     pub favorite_food: String,
     #[serde(rename(deserialize = "cAnD13s_3ATeN-yesT3rdAy"))]
     #[serde(default)]
-    pub candies_eaten_yesterday: u8, // cAnD13s_3ATeN-yesT3rdAy
+    pub candies_eaten_yesterday: u8,
 }
 
 pub struct DeerCollection<'a> {
@@ -113,23 +92,14 @@ impl DeerContestOutput {
     }
 }
 
-#[derive(Debug, Serialize)]
-pub struct ElfCount {
-    #[serde(rename(serialize = "elf"))]
-    count: u32,
-    #[serde(rename(serialize = "elf on a shelf"))]
-    on_shelf: u32,
-    #[serde(rename(serialize = "shelf with no elf on it"))]
-    empty_shelf: u32,
+#[post("/4/strength", data="<deers>")]
+pub fn reindeer_cheer(deers: Json<Vec<Deer>>) -> String {
+    let collection = DeerCollection::new(deers.iter().collect());
+    collection.strength().to_string()
 }
 
-impl ElfCount {
-    pub fn new(count: u32, on_shelf: u32, empty_shelf: u32) -> Self {
-        ElfCount {
-            count,
-            on_shelf,
-            empty_shelf
-        }
-    }
+#[post("/4/contest", data="<deers>")]
+pub fn eating_candy_contest(deers: Json<Vec<Deer>>) -> Json<DeerContestOutput> {
+    let collection = DeerCollection::new(deers.iter().collect());
+    Json(DeerContestOutput::from_deer_collection(collection))
 }
-
